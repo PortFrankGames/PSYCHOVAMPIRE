@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using Ink.Runtime;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 // This is a super bare bones example of how to play and display a ink story in Unity.
 public class BasicInkExample : MonoBehaviour {
@@ -49,10 +50,11 @@ public class BasicInkExample : MonoBehaviour {
 		}
 		// If we've read all the content and there's no choices, the story is finished!
 		else {
-			Button choice = CreateChoiceView("End of story.\nRestart?");
-			choice.onClick.AddListener(delegate{
-				StartStory();
-			});
+			Button choice = CreateChoiceView("End vision");
+			choice.onClick.AddListener(delegate
+            {
+                AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("Board");
+            });
 		}
 	}
 
@@ -66,31 +68,27 @@ public class BasicInkExample : MonoBehaviour {
 	void CreateContentView (string text) {
         TMP_Text storyText = Instantiate (textPrefab) as TMP_Text;
 		storyText.text = text;
-		storyText.transform.SetParent (canvas.transform, false);
+		storyText.transform.SetParent (panel.transform, false);
 	}
 
 	// Creates a button showing the choice text
 	Button CreateChoiceView (string text) {
 		// Creates the button from a prefab
 		Button choice = Instantiate (buttonPrefab) as Button;
-		choice.transform.SetParent (canvas.transform, false);
+		choice.transform.SetParent (panel.transform, false);
 		
 		// Gets the text from the button prefab
 		TMP_Text choiceText = choice.GetComponentInChildren<TMP_Text> ();
 		choiceText.text = text;
-
-		//// Make the button expand to fit the text
-		//HorizontalLayoutGroup layoutGroup = choice.GetComponent <HorizontalLayoutGroup> ();
-		//layoutGroup.childForceExpandHeight = false;
 
 		return choice;
 	}
 
 	// Destroys all the children of this gameobject (all the UI)
 	void RemoveChildren () {
-		int childCount = canvas.transform.childCount;
+		int childCount = panel.transform.childCount;
 		for (int i = childCount - 1; i >= 0; --i) {
-			GameObject.Destroy (canvas.transform.GetChild (i).gameObject);
+			GameObject.Destroy (panel.transform.GetChild (i).gameObject);
 		}
 	}
 
@@ -99,7 +97,7 @@ public class BasicInkExample : MonoBehaviour {
 	public Story story;
 
 	[SerializeField]
-	private Canvas canvas;
+	private GameObject panel;
 
 	// UI Prefabs
 	[SerializeField]
